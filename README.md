@@ -4,11 +4,8 @@ Consumer type scenarios often involve providing users with more than one option 
 
 Verified Account Linking workflow is provided as a customized extensibility solution, that leverages Auth0 functionality to address the sort of problems that can occur in unverified account link scenarios. For further information regarding this, or any other Auth0 customized extensibility provided, please feel free to get in touch. 
 
-<div style="background-color:#fff7c9; color:#786600; margin-bottom:20px; padding:1rem 1.25rem">
-	<div >
-		<p>The Auth0 <a href="https://auth0.com/docs/extensions/account-link-extension">Account Link Extension</a> is provided out-of-box to handle the most typical workflow - which provides for the linking of user accounts during sign-up/sign-in. Use of the Account Link Extension is the recommended best practice, .</p>
-</div></div>
-
+> The Auth0 [Account Link Extension](https://auth0.com/docs/extensions/account-link-extension) is provided to handle the most typical user case - i.e. workflow which provides for the linking of user accounts during sign-up/sign-in. Use of the Account Link Extension is a recommended best practice, and for most cases the Account Link Extension provides functionality that can be used out-of-box. However, use of the Account Link Extension can be [challenging in a number of situations](https://docs.google.com/document/d/149DypzRAUDK4ag4wzYBbL0_PwF9INcMkIBbfHkyKZNQ/edit#bookmark=id.pglt9vx5ds4u), and in such circumstances use of the solution provided here can be beneficial.
+ 
 ## Design documentation
 
 [Custom Implementation Services](https://auth0.com/docs/services/packages#-custom-implementation-package-) to support functionality not supported out-of-the-box are provided by Auth0 Professional Services, and a wide variety of services are offered to help address a number of use case scenarios. These services can be leveraged to provide you with a complete solution for Verified Account Linking - in either a stand-alone fashion or in conjunction with other customization. However we also provide you with full design documentation (see below) if you prefer to implement yourself.  
