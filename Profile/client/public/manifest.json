@@ -1,0 +1,8 @@
+{
+  "short_name": "Profile Management",
+  "name": "Profile Management Application",
+  "start_url": "/Profile/client/index.html",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
