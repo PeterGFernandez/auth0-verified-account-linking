@@ -1,8 +1,13 @@
 # Auth0 Verified Account Linking
 
-Self-service facility typically provides users with the capability to change one or more aspects of their user profile. Commonly referred to as _MyAccount_ or _MyProfile_ functionality, this often includes the ability for a user to change his/her email address, for cases where an existing email address is no longer valid or a different email address is preferred. Self-service email address change without the proper controls however, can lead to various account management issues, and/or expose security vulnerabilities which can be exploited. 
+Consumer type scenarios often involve providing users with more than one option to authenticate. This offers customers great flexibility, and serves to reduce friction by mitigating the need to repetitively enter (personal) information. Use of social providers such as Facebook, Twitter or Google, will typically result in a smoother sign-up or sign-in (a.k.a. login) experience but can lead to frustration for a user if their account/profile changes depending on which provider they choose. Further, self-service typically provides users with the ability to change one or more aspects of their user profile (through some _MyAccount_/_MyProfile_ functionality, say) and providing some capability for some self-serviced account/profile association could, without the proper control, potentially lead to security vulnerabilities which could be exploited. 
 
 Verified Account Linking workflow is provided as a customized extensibility solution, that leverages Auth0 functionality to address the sort of problems that can occur in unverified account link scenarios. For further information regarding this, or any other Auth0 customized extensibility provided, please feel free to get in touch. 
+
+<div style="background-color:#fff7c9; color:#786600; margin-bottom:20px; padding:1rem 1.25rem">
+	<div >
+		<p>The Auth0 <a href="https://auth0.com/docs/extensions/account-link-extension">Account Link Extension</a> is provided out-of-box to handle the most typical workflow - which provides for the linking of user accounts during sign-up/sign-in. Use of the Account Link Extension is the recommended best practice, .</p>
+</div></div>
 
 ## Design documentation
 
@@ -12,19 +17,19 @@ Verified Account Linking workflow is provided as a customized extensibility solu
   <a href="https://docs.google.com/document/d/149DypzRAUDK4ag4wzYBbL0_PwF9INcMkIBbfHkyKZNQ"><img src="./Verified%20Account%20Linking%20esign.png" alt="Verified Account Linking workflow in Auth0 - Design Document"></a>
 </div>
 
-Detailed design documentation (follow link above to access) provides you with a comprehensive set of information that is implementation agnostic. Using this, you and your team can implement Verified Email Address Change workflow whatever the technology stack you currently, or indeed plan, to utilize. The information is provided free of charge and without warranty (either explicit or implied).    
+Detailed design documentation (follow link above to access) provides you with a comprehensive set of information that is implementation agnostic. Using this, you and your team can implement Verified Account Linking workflow whatever the technology stack you currently, or indeed plan, to utilize. The information is provided free of charge and without warranty (either explicit or implied).    
 
 ## Reference implementation
 
-This repository also contains reference implementation developed using [Node.js](https://nodejs.org/en/), and is provided to accelerate development of that part of the design which deals with actual [email address change](https://docs.google.com/document/d/1DtjpHFTwK6wN0B6BlaaXpbIFbU0BlUagDlymP0RGZgw/edit#bookmark=id.7i3duzkz1ihl). This implementation is provided free of charge and without warranty either explicit or implied. Please note that no sample implementation is provided for that part of the design dealing with [email address change initiation](https://docs.google.com/document/d/1DtjpHFTwK6wN0B6BlaaXpbIFbU0BlUagDlymP0RGZgw/edit#bookmark=id.2zd5mvs4taxv).
+This repository also contains reference implementation developed using [Node.js](https://nodejs.org/en/), and is provided to accelerate development. This implementation is provided free of charge and without warranty either explicit or implied.
 
 ### Profile Management
 
-The [Profile](Profile) folder contains reference Node.js implementation that can be used as a basis to build out Profile Management functionality in order to support Verified Email Address Change. For further details please refer to the [readme](Profile) contained in the folder.
+The [Profile](Profile) folder contains reference Node.js implementation that can be used as a basis to build out Profile Management functionality in order to support Verified Account Linking. For further details please refer to the [readme](Profile) contained in the folder.
 
 ### Auth0 Configuration
 
-The [Tenant](tenant) folder contains reference Auth0 Tenant configuration and asset definitions that can be used as a basis to build out functionality in order to support Verified Email Address Change. For further details please refer to the [readme](Tenant) contained in the folder.
+The [Tenant](tenant) folder contains reference Auth0 Tenant configuration and asset definitions that can be used as a basis to build out functionality in order to support Verified Account Linking. For further details please refer to the [readme](Tenant) contained in the folder.
 
 ## About Auth0
 
