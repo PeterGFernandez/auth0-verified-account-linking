@@ -1,0 +1,7 @@
+{
+  "enabled": true,
+  "script": "./Verified Account Linking.js",
+  "name": "Verified Account Linking",
+  "order": 6,
+  "stage": "login_success"
+}
