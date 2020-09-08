@@ -1,0 +1,44 @@
+{
+  "name": "prmclient",
+  "description": "Profile Management Client",
+  "version": "2.0.0",
+  "private": true,
+  "keywords": [
+    "Profile",
+    "Management",
+    "Client"
+  ],
+  "author": "Peter Fernandez",
+  "license": "ISC",
+  "dependencies": {
+    "@auth0/auth0-spa-js": "^1.8.1",
+    "ajv": "^6.12.2",
+    "auth0-js": "^9.13.2",
+    "auth0-lock": "^11.24.0",
+    "axios": "^0.19.2",
+    "dotenv": "^8.2.0",
+    "jquery": "^3.5.1",
+    "jsonwebtoken": "^8.4.0",
+    "querystring": "^0.2.0",
+    "react": "^16.13.1",
+    "react-cookie": "^3.1.2",
+    "react-dom": "^16.13.1",
+    "react-loading-overlay": "^0.3.0",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "1.1.4",
+    "react-stepzilla": "^6.0.2"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "proxy": "http://localhost:3000/Profile",
+  "homepage": "http://localhost:3000/Profile/client",
+  "devDependencies": {
+    "@types/auth0-lock": "^11.4.13",
+    "@types/react": "^16.9.35",
+    "@types/react-dom": "^16.9.8"
+  }
+}
