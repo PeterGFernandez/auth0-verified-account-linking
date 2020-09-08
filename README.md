@@ -11,7 +11,7 @@ Verified Account Linking workflow is provided as a customized extensibility solu
 [Custom Implementation Services](https://auth0.com/docs/services/packages#-custom-implementation-package-) to support functionality not supported out-of-the-box are provided by Auth0 Professional Services, and a wide variety of services are offered to help address a number of use case scenarios. These services can be leveraged to provide you with a complete solution for Verified Account Linking - in either a stand-alone fashion or in conjunction with other customization. However we also provide you with full design documentation (see below) if you prefer to implement yourself.  
 
 <div align="center">
-  <a href="https://docs.google.com/document/d/149DypzRAUDK4ag4wzYBbL0_PwF9INcMkIBbfHkyKZNQ"><img src="./Verified%20Account%20Linking%20esign.png" alt="Verified Account Linking workflow in Auth0 - Design Document"></a>
+  <a href="https://docs.google.com/document/d/149DypzRAUDK4ag4wzYBbL0_PwF9INcMkIBbfHkyKZNQ"><img src="./Verified%20Account%20Linking%20Design.png" alt="Verified Account Linking workflow in Auth0 - Design Document"></a>
 </div>
 
 Detailed design documentation (follow link above to access) provides you with a comprehensive set of information that is implementation agnostic. Using this, you and your team can implement Verified Account Linking workflow whatever the technology stack you currently, or indeed plan, to utilize. The information is provided free of charge and without warranty (either explicit or implied).    
