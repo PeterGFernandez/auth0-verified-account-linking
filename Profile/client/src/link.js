@@ -11,38 +11,80 @@ class AccountLink extends Component {
 //if (process.env.NODE_ENV !== 'production') {
 //}
     //
-    props.context.appState = props.context.appState || {};
-    props.context.appState.link = props.context.appState.link || {};
-    props.context.appState.continue = true;
+    props.policy = props.policy || {};
+    props.appState = props.appState || {};
+    props.appState.link = props.appState.link || {};
     super(props);
 
     this.state = {
-      executing: props.context.appState.link.executing,
-      executed: props.context.appState.link.executed,
-      error: props.context.appState.link.error
+      executing: props.appState.link.executing,
+      executed: props.appState.link.executed,
+      error: props.appState.link.error
     };
 
     // This binding is necessary to make `this` work in the callback
     this.handleClick = this.handleClick.bind(this);
   }
 
+  componentDidMount() {
+    var that=this;
+    if (
+      that.state.executing && !that.state.error) {
+      that.props.auth0Client
+        .getTokenSilently({
+          audience: process.env.REACT_APP_PROFILE_AUDIENCE,
+          appState: that.props.appState,
+          scope: 'link:account'
+        })
+        .then(accessToken => {
+          this.props.appState.continue = {
+            companion: accessToken          
+          }
+          that.setState({
+            executing: false,
+            executed: true,
+            error: null
+          });
+        })
+        .catch(error => {
+          DEBUG(error);
+          switch(error.error) {
+            case 'login_required':
+            case 'consent_required':
+            default:
+              that.props.auth0Client.loginWithRedirect({
+                audience: process.env.REACT_APP_PROFILE_AUDIENCE,
+                appState: that.props.appState,
+                scope: 'link:account'
+              })
+              .catch(error => {
+                DEBUG(error);
+                that.setState({
+                  executing: false,
+                  executed: true,
+                  error: error
+                });
+              });
+              break;
+          }
+        });    
+    };  
+  }
+
   handleClick() {
     var that=this;
-    that.setState({
+    that.props.appState.link = {
       executing: true,
       executed: false,
       error: null
-    });
-    that.props.context.appState.link = {
-      executing: false,
-      executed: true,
-      error: null
     };
+    that.setState(
+    that.props.appState.link);
     that.props.auth0Client.loginWithRedirect({
-      connection: that.props.context.policy.link.connection,
+      connection: that.props.policy.link.connection,
       audience: process.env.REACT_APP_PROFILE_AUDIENCE,
-      appState: that.props.context.appState,
-      scope: 'profile:account link:account',
+      appState: that.props.appState,
+      scope: 'link:account',
       prompt: 'login'
     })
     .catch(error => {
@@ -116,7 +158,7 @@ class AccountLink extends Component {
   }
 
   isValidated() {
-    this.props.context.appState.link = this.state;
+    this.props.appState.link = this.state;
     //  Update the following if you want to mandate account linking
     return(
       this.state.executing?false:

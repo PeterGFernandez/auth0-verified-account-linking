@@ -10,10 +10,6 @@
     {
       "value": "link:account",
       "description": "Link Account"
-    },
-    {
-      "value": "profile:account",
-      "description": "Progressively Profile Account"
     }
   ],
   "enforce_policies": true,

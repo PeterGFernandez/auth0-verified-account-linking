@@ -22,6 +22,56 @@ function VALink(user, context, callback) {
     domain: auth0.domain
   });
 
+  // JWT Verifier funcion for Auth0 RS256 signed tokens
+  global.verifyJWT = global.verifyJWT || function (JWT)  {
+    var jwt = require('jsonwebtoken');
+    var jwksRsa = require('jwks-rsa');
+    DEBUG(LOG_TAG, "Verifying Token");
+    return new Promise((resolve, reject) => {
+      /* Decode unverified JWT to obtain Key ID */
+      var token = jwt.decode(JWT, {
+        complete: true
+      });
+      var header = token.header || {};
+      var kid = header.kid || "";
+      global.jwks = global.jwks || jwksRsa({
+        strictSsl: true,
+        rateLimit: true,
+        cache: true,
+        // Default 24 hour maximum age             
+        cacheMaxAge: configuration.JWKSCACHE_MAX_AGE || 8640000,   
+        // Default of 5 max cache entries              
+        cacheMaxEntries: configuration.JWKSCACHE_MAX_ENTRIES || 5,    
+        jwksUri: 'https://' + auth0.domain + '/.well-known/jwks.json',
+      });
+      global.jwks.getSigningKey(kid, (error, key) => {
+        if (error) {
+          console.error(LOG_TAG, "Error obtaining signing key = ", error);
+          reject(error);
+        } else {
+          const signingKey = key.publicKey || key.rsaPublicKey;
+          DEBUG(LOG_TAG, "signing key = ", signingKey);
+
+          /* Verify JWT */
+          jwt.verify(
+            JWT, 
+            signingKey, {
+              // Default 5 second tolerance                    
+              clockTolerance: configuration.CLOCK_TOLERANCE || 5,
+              issuer: 'https://' + context.request.hostname + '/',
+              audience: configuration.PROFILE_AUDIENCE, 
+              algorithms:["RS256"]
+            }, function(error, decoded) {
+              if (error) {
+                return reject(error);
+              }
+              return resolve(decoded);
+            });
+        }
+      });
+    });
+  };
+
   // State Machine
   user.app_metadata = user.app_metadata || {};
   switch (context.protocol) {
@@ -35,100 +85,42 @@ function VALink(user, context, callback) {
       DEBUG(LOG_TAG, "Evaluating Account Link for ", user.user_id);
       if (
         context.request &&
-        context.request.query &&
-        context.request.query.companion &&
+        context.request.body &&
+        context.request.body.companion &&
         user.app_metadata.policy.link.companion) {
-        Promise.resolve(new 
-        Promise(function (resolve, reject) {
-          var jwt = require('jsonwebtoken');
-          var jwksRsa = require('jwks-rsa');
-          DEBUG(LOG_TAG, "User app_metadata = ", user.app_metadata);
-          DEBUG(LOG_TAG, "Evaluating Account Link for ", user.user_id);
-          DEBUG(LOG_TAG, "Evaluated Account Link policy = ", user.app_metadata.policy.link);
-          try {
-            /* Decode unverified companion to obtain Key ID */
-            var token = jwt.decode(
-              context.request.query.companion, {
-                complete: true
-              });
-            var header = token.header || {};
-            var kid = header.kid || "";
-            DEBUG(LOG_TAG, "Obtaining Keys");
+        Promise.resolve(global.verifyJWT(context.request.body.companion))
+        .then(function (decoded) {
+          LOG_TAG = LOG_TAG + '[LINKING]: ';
+          DEBUG(LOG_TAG, "Linking User Accounts");
 
-            global.jwks = global.jwks || jwksRsa({
-              strictSsl: true,
-              rateLimit: true,
-              cache: true,
-              // Default 24 hour maximum age             
-              cacheMaxAge: configuration.JWKSCACHE_MAX_AGE || 8640000,   
-              // Default of 5 max cache entries              
-              cacheMaxEntries: configuration.JWKSCACHE_MAX_ENTRIES || 5,    
-              jwksUri: 'https://' + auth0.domain + '/.well-known/jwks.json',
+          /* Link accounts? */
+          if (user.app_metadata.policy.link.companion === decoded.sub) {
+            managementAPI.users.link(
+              user.app_metadata.policy.link.companion, {
+              user_id: user.user_id,
+              provider: user.identities[0].provider
+            })  
+            .then(function (identities) {
+              DEBUG(LOG_TAG, "Identities = ",identities);
+              context.primaryUser = user.app_metadata.policy.link.companion;
+
+              /* Update identities array so any subsequent Rule can benefit */ 
+              user.identities = identities;
+              callback(null, user, context);
+            })
+            .catch(function (error) {
+              console.error(LOG_TAG, "Error linking accounts = ", error);
+              callback(new UnauthorizedError(0, error), user, context);
             });
-            global.jwks.getSigningKey(kid, (error, key) => {
-              if (error) {
-                console.error(LOG_TAG, "Error obtaining signing key = ", error);
-                reject(error);
-              } else {
-                const signingKey = key.publicKey || key.rsaPublicKey;
-                DEBUG(LOG_TAG, "signing key = ", signingKey);
-
-                /* Verify companion */
-                jwt.verify(
-                  context.request.query.companion, 
-                  signingKey, {
-                    // Default 5 second tolerance                    
-                    clockTolerance: configuration.CLOCK_TOLERANCE || 5,
-                    issuer: 'https://' + context.request.hostname + '/',
-                    audience: configuration.PROFILE_AUDIENCE, 
-                    algorithms:["RS256"]
-                  }, function(error, decoded) {
-                    if (error) {
-                      console.error(LOG_TAG, "Error verifying companion = ", error);
-                      reject(error);
-                    } else  {
-                      LOG_TAG = LOG_TAG + '[LINKING]: ';
-                      DEBUG(LOG_TAG, "Linking User Accounts");
-
-                      /* Link accounts?
-                      */
-                      if (user.app_metadata.policy.link.companion === decoded.sub) {
-                        managementAPI.users.link(
-                          user.app_metadata.policy.link.companion, {
-                          user_id: user.user_id,
-                          provider: user.identities[0].provider
-                        })  
-                        .then(function (identities) {
-                          DEBUG(LOG_TAG, "Identities = ",identities);
-                          context.primaryUser = user.app_metadata.policy.link.companion;
-
-                          /* Update identities array so any subsequent Rule can benefit */ 
-                          user.identities = identities;
-                          resolve();
-                        })
-                        .catch(function (error) {
-                          console.error(LOG_TAG, "Error linking accounts = ", error);
-                          reject(error);
-                        });
-                      } else {
-                        DEBUG(LOG_TAG, "Incorrect companion; ignore");
-                        resolve();
-                      }
-                    }
-                });
-              }
-            });
-          } catch (error) {
-            reject(error);
+          } else {
+            DEBUG(LOG_TAG, "Incorrect companion; ignore");
+	          callback(null, user, context);
           }
-        }))
-        .then(function () {
-          callback(null, user, context);
         })
         .catch(function (error) {
           console.error(LOG_TAG, error);
           callback(new UnauthorizedError(0, error), user, context);
-        });
+      	});
       } else {
         DEBUG(LOG_TAG,"User Linking Skipped");
         callback(null, user, context);
@@ -136,15 +128,14 @@ function VALink(user, context, callback) {
     } break;
 
     default: {
-      DEBUG(LOG_TAG, "PROFILE_SERVICE = ", configuration.PROFILE_SERVICE);
       DEBUG(LOG_TAG, "PROFILE_CLIENT = ", configuration.PROFILE_CLIENT);
       DEBUG(LOG_TAG, "context =", context.clientID);
       switch(context.clientID) {
-        case configuration.PROFILE_SERVICE:
         case configuration.PROFILE_CLIENT: {
           LOG_TAG = LOG_TAG + '[PROFILE]: ';
           Promise.resolve(new 
           Promise(function (resolve) {
+            context.request.query = context.request.query || {};
             DEBUG(LOG_TAG, "PROFILE_AUDIENCE = ", configuration.PROFILE_AUDIENCE);
             DEBUG(LOG_TAG, "audience =", context.request.query.audience);
             switch (context.request.query.audience) {
