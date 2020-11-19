@@ -22,61 +22,11 @@ function VALink(user, context, callback) {
     domain: auth0.domain
   });
 
-  // JWT Verifier funcion for Auth0 RS256 signed tokens
-  global.verifyJWT = global.verifyJWT || function (JWT)  {
-    var jwt = require('jsonwebtoken');
-    var jwksRsa = require('jwks-rsa');
-    DEBUG(LOG_TAG, "Verifying Token");
-    return new Promise((resolve, reject) => {
-      /* Decode unverified JWT to obtain Key ID */
-      var token = jwt.decode(JWT, {
-        complete: true
-      });
-      var header = token.header || {};
-      var kid = header.kid || "";
-      global.jwks = global.jwks || jwksRsa({
-        strictSsl: true,
-        rateLimit: true,
-        cache: true,
-        // Default 24 hour maximum age             
-        cacheMaxAge: configuration.JWKSCACHE_MAX_AGE || 8640000,   
-        // Default of 5 max cache entries              
-        cacheMaxEntries: configuration.JWKSCACHE_MAX_ENTRIES || 5,    
-        jwksUri: 'https://' + auth0.domain + '/.well-known/jwks.json',
-      });
-      global.jwks.getSigningKey(kid, (error, key) => {
-        if (error) {
-          console.error(LOG_TAG, "Error obtaining signing key = ", error);
-          reject(error);
-        } else {
-          const signingKey = key.publicKey || key.rsaPublicKey;
-          DEBUG(LOG_TAG, "signing key = ", signingKey);
-
-          /* Verify JWT */
-          jwt.verify(
-            JWT, 
-            signingKey, {
-              // Default 5 second tolerance                    
-              clockTolerance: configuration.CLOCK_TOLERANCE || 5,
-              issuer: 'https://' + context.request.hostname + '/',
-              audience: configuration.PROFILE_AUDIENCE, 
-              algorithms:["RS256"]
-            }, function(error, decoded) {
-              if (error) {
-                return reject(error);
-              }
-              return resolve(decoded);
-            });
-        }
-      });
-    });
-  };
-
   // State Machine
-  user.app_metadata = user.app_metadata || {};
   switch (context.protocol) {
     case 'redirect-callback': {
       LOG_TAG = LOG_TAG + '[REDIRECT_CALLBACK]: ';
+      user.app_metadata = user.app_metadata || {};
       user.app_metadata.policy = 
       user.app_metadata.policy || {};
       user.app_metadata.policy.link = 
@@ -130,6 +80,7 @@ function VALink(user, context, callback) {
     default: {
       DEBUG(LOG_TAG, "PROFILE_CLIENT = ", configuration.PROFILE_CLIENT);
       DEBUG(LOG_TAG, "context =", context.clientID);
+      user.app_metadata = user.app_metadata || {};
       switch(context.clientID) {
         case configuration.PROFILE_CLIENT: {
           LOG_TAG = LOG_TAG + '[PROFILE]: ';

@@ -1,0 +1,7 @@
+{
+  "enabled": true,
+  "script": "./Verify JWT.js",
+  "name": "Verify JWT",
+  "order": 1,
+  "stage": "login_success"
+}
